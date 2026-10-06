@@ -38,9 +38,19 @@ select {
 main {
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+/* <strudel-editor> itself stays empty: the real editor is mounted as a
+   sibling <div> right after it (see @strudel/repl connectedCallback). */
 strudel-editor {
-  display: block;
-  height: 100%;
+  display: contents;
+}
+
+strudel-editor + div {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
