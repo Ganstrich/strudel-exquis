@@ -58,7 +58,9 @@ Dans le terminal **du container** :
 npm run dev
 ```
 
-Ouvre http://localhost:5173 (VS Code forward le port 5173 automatiquement).
+VS Code ouvre automatiquement l'application dans son aperçu intégré quand le
+port 5173 est détecté. Si l'aperçu ne s'ouvre pas, clique sur le port **Strudel**
+dans le panneau **Ports** de VS Code, ou ouvre http://localhost:5173.
 Le son est produit par le navigateur de ta machine — rien à configurer côté audio.
 
 ### 4. Vérifier que tout marche (hello world)

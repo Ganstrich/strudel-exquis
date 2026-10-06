@@ -11,11 +11,53 @@
       <h1>strudel-exquis</h1>
       <label for="pattern-select">Pattern</label>
       <select id="pattern-select"></select>
+      <button id="start-pattern" type="button" title="Évaluer et jouer le pattern">▶ Start</button>
+      <button id="stop-pattern" type="button" title="Arrêter tous les patterns">■ Stop</button>
       <button id="sync-pattern" type="button" title="Enregistrer le code affiché dans son fichier patterns/*.js">
         💾 Sync
       </button>
+      <button id="help-toggle" type="button" aria-controls="quick-sheet" aria-expanded="true" title="Afficher ou masquer l'aide">
+        ? Help
+      </button>
     </header>
-    <main id="strudel"></main>
+    <main>
+      <div class="editor-layout">
+        <div class="editor-pane">
+          <div class="editor-bar">
+            <code id="pattern-path"></code>
+          </div>
+          <section id="strudel" aria-label="Live Strudel editor"></section>
+        </div>
+        <aside id="quick-sheet" class="quick-sheet" aria-label="Quick sheet">
+          <p class="eyebrow">LIVE EDITOR</p>
+          <h2>Quick sheet</h2>
+          <p class="status" id="audio-status" role="status">Ready to play</p>
+          <section class="quick-group">
+            <h3>Mini-notation</h3>
+            <p><code>bd sd hh</code> séquence</p>
+            <p><code>~</code> silence · <code>[bd hh]</code> groupe</p>
+            <p><code>*2</code> accélère · <code>/2</code> ralentit</p>
+            <p><code>,</code> parallèle · <code>&lt;c e g&gt;</code> alterne</p>
+          </section>
+          <section class="quick-group">
+            <h3>Sounds & notes</h3>
+            <p><code>s("bd sd")</code> sons</p>
+            <p><code>.bank("RolandTR909")</code> banque</p>
+            <p><code>note("&lt;c e g&gt;")</code> notes</p>
+            <p><code>$:</code> plusieurs patterns</p>
+          </section>
+          <section class="quick-group">
+            <h3>Effects</h3>
+            <p><code>.gain(.8)</code> volume · <code>.room(.5)</code> espace</p>
+            <p><code>.delay(.25)</code> écho · <code>.lpf(800)</code> filtre</p>
+            <p><code>.fast(2)</code> accélère · <code>.rev()</code> inverse</p>
+          </section>
+          <a class="reference-link" href="https://strudel.cc/workshop/recap/" target="_blank" rel="noreferrer">
+            Recap complet ↗
+          </a>
+        </aside>
+      </div>
+    </main>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import '@strudel/repl';
 
 // Every file in patterns/ is loaded as raw text and handed to the Strudel editor.
-const patterns = import.meta.glob('../patterns/*.js', {
+const patterns = import.meta.glob('../patterns/**/*.js', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -10,8 +10,10 @@ const patterns = import.meta.glob('../patterns/*.js', {
 const names = Object.keys(patterns).sort();
 const select = document.getElementById('pattern-select');
 const container = document.getElementById('strudel');
+const patternPath = document.getElementById('pattern-path');
 
-const label = (path) => path.replace('../patterns/', '').replace(/\.js$/, '');
+const relativePath = (path) => path.replace('../patterns/', '');
+const label = (path) => relativePath(path).replace(/\.js$/, '');
 
 // Defensive: if this module ever gets re-executed (e.g. a stray HMR reload
 // of main.js itself) instead of a full page reload, don't pile up a second
@@ -29,10 +31,32 @@ for (const path of names) {
 const initial = new URLSearchParams(location.search).get('pattern');
 const current = names.includes(`../patterns/${initial}.js`) ? `../patterns/${initial}.js` : names[0];
 select.value = current;
+patternPath.textContent = `patterns/${relativePath(current)}`;
 
 const editor = document.createElement('strudel-editor');
 editor.setAttribute('code', patterns[current] ?? '// add a file in patterns/ to get started');
 container.append(editor);
+
+const startButton = document.getElementById('start-pattern');
+const stopButton = document.getElementById('stop-pattern');
+const helpToggle = document.getElementById('help-toggle');
+const quickSheet = document.getElementById('quick-sheet');
+const audioStatus = document.getElementById('audio-status');
+
+startButton.addEventListener('click', () => {
+  editor.editor?.evaluate();
+  audioStatus.textContent = 'Playing';
+});
+
+stopButton.addEventListener('click', async () => {
+  await editor.editor?.stop();
+  audioStatus.textContent = 'Stopped';
+});
+
+helpToggle.addEventListener('click', () => {
+  const isHidden = quickSheet.toggleAttribute('hidden');
+  helpToggle.setAttribute('aria-expanded', String(!isHidden));
+});
 
 select.addEventListener('change', () => {
   const url = new URL(location.href);

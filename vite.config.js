@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const patternsDir = path.join(import.meta.dirname, 'patterns');
@@ -21,12 +21,19 @@ function patternSaverPlugin() {
         req.on('end', async () => {
           try {
             const { name, code } = JSON.parse(body);
-            if (typeof name !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(name) || typeof code !== 'string') {
+            const segments = typeof name === 'string' ? name.split('/') : [];
+            if (
+              !segments.length ||
+              segments.some((segment) => !/^[a-zA-Z0-9_-]+$/.test(segment)) ||
+              typeof code !== 'string'
+            ) {
               res.statusCode = 400;
               res.end('Invalid name or code');
               return;
             }
-            await writeFile(path.join(patternsDir, `${name}.js`), code, 'utf8');
+            const target = path.join(patternsDir, ...segments) + '.js';
+            await mkdir(path.dirname(target), { recursive: true });
+            await writeFile(target, code, 'utf8');
             res.statusCode = 204;
             res.end();
           } catch (err) {

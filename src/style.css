@@ -20,6 +20,10 @@ header {
   border-bottom: 1px solid #2a2e36;
 }
 
+header button {
+  white-space: nowrap;
+}
+
 h1 {
   font-size: 1rem;
   margin: 0;
@@ -48,9 +52,105 @@ button:disabled {
 main {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+
+.editor-layout {
   display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.editor-pane {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.editor-bar {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid #2a2e36;
+  background: #181b20;
+  color: #8f97a5;
+  font-size: 0.75rem;
+}
+
+.editor-bar code {
+  color: #e0a458;
+}
+
+#strudel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   flex-direction: column;
   overflow: hidden;
+}
+
+.quick-sheet {
+  width: 15rem;
+  flex: 0 0 15rem;
+  padding: 1.25rem;
+  overflow: auto;
+  border-left: 1px solid #2a2e36;
+  background: #1a1d23;
+  color: #b7bdc9;
+}
+
+.quick-sheet[hidden] {
+  display: none;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: #e0a458;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.quick-sheet h2 {
+  margin: 0 0 0.8rem;
+  color: #f1f3f5;
+  font-size: 1rem;
+}
+
+.status {
+  margin: 0 0 1.25rem;
+  color: #7ed6a5;
+  font-size: 0.8rem;
+}
+
+.quick-group {
+  padding: 0.75rem 0;
+  border-top: 1px solid #2a2e36;
+}
+
+.quick-group h3 {
+  margin: 0 0 0.45rem;
+  color: #f1f3f5;
+  font-size: 0.8rem;
+}
+
+.quick-group p {
+  margin: 0.3rem 0 0;
+  color: #8f97a5;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.quick-sheet code {
+  color: #e0a458;
+}
+
+.reference-link {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: #e0a458;
+  font-size: 0.75rem;
 }
 
 /* <strudel-editor> itself stays empty: the real editor is mounted as a
@@ -63,4 +163,20 @@ strudel-editor + div {
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+@media (max-width: 760px) {
+  header {
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    width: 100%;
+  }
+
+  .quick-sheet {
+    width: 12rem;
+    flex-basis: 12rem;
+    padding: 1rem;
+  }
 }
