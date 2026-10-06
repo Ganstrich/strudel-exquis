@@ -4,11 +4,33 @@
 // vers la sortie. L'analyser est relié à un gain 0 : il ne change pas le son.
 
 let analyser = null;
+let frequencyData = null;
 const internalNodes = new WeakSet();
 let installed = false;
 
 export function getAnalyser() {
   return analyser;
+}
+
+const bands = { low: 0, mid: 0, high: 0 };
+
+export function getAudioBands() {
+  if (!analyser) return bands;
+  if (!frequencyData || frequencyData.length !== analyser.frequencyBinCount) {
+    frequencyData = new Uint8Array(analyser.frequencyBinCount);
+  }
+  analyser.getByteFrequencyData(frequencyData);
+
+  const average = (start, end) => {
+    let sum = 0;
+    for (let index = start; index < end; index += 1) sum += frequencyData[index];
+    return sum / ((end - start) * 255);
+  };
+
+  bands.low = average(1, 12);
+  bands.mid = average(12, 96);
+  bands.high = average(96, 384);
+  return bands;
 }
 
 function tapContext(context) {

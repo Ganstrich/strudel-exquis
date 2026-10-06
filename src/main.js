@@ -1,9 +1,10 @@
 import '@strudel/repl';
-import { installAudioTap } from './addons/audio-tap.js';
+import { getAudioBands, installAudioTap } from './addons/audio-tap.js';
 import { setupAddons } from './addons/index.js';
 
 // Doit être installé avant que Strudel ne crée son AudioContext (au premier clic).
 installAudioTap();
+globalThis.strudelAudio = getAudioBands;
 
 // Every file in patterns/ is loaded as raw text and handed to the Strudel editor.
 const patterns = import.meta.glob('../patterns/**/*.js', {

@@ -2,14 +2,25 @@
 // @version 1.0
 
 await initHydra();
+osc(30, 0.05, () => 1.5 + strudelAudio().low * 2)
+  .color(
+    () => 0.05 + strudelAudio().low * 0.3,
+    () => 1.5 + strudelAudio().mid * 3,
+    () => 2 + strudelAudio().high * 4,
+  )
+  .rotate(0.2, () => 0.03 + strudelAudio().high * 0.3)
+  .modulate(noise(3), () => 0.1 + strudelAudio().mid * 0.6)
+  .out(o0);
+
+await initHydra();
 osc(30, 0.05, 1.5)
   .color(0.7, 4, 5.2)
   .rotate(0.2, H(sine.range(-.1,.1).slow(16)))
   .modulate(noise(3), H(perlin.range(.15,1.5)))
   .out(o0);
 
-  setcps(1)
-  stack(
+setcps(1)
+$: stack(
     note("[<g1 f1>/8](<3 5>,8)")
     .clip(perlin.range(.15,1.5))
     .release(.1)
