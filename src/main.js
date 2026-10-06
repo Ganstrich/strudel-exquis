@@ -51,13 +51,26 @@ syncButton.addEventListener('click', async () => {
   syncButton.disabled = true;
   syncButton.textContent = '…';
   try {
-    const res = await fetch('/api/save-pattern', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: label(current), code }),
-    });
+    let res;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        res = await fetch('/api/save-pattern', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: label(current), code }),
+          signal: controller.signal,
+        });
+        if (res.ok || res.status < 500) break;
+      } catch (err) {
+        if (attempt === 2) throw err;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
     patterns[current] = code;
-    syncButton.textContent = res.ok ? '✓ Sync' : '✗ Erreur';
+    syncButton.textContent = res?.ok ? '✓ Sync' : '✗ Erreur';
   } catch (err) {
     console.error('[pattern-saver] save failed', err);
     syncButton.textContent = '✗ Erreur';
