@@ -71,14 +71,27 @@ après un clic dans la page (politique autoplay des navigateurs).
 
 ## Écrire son fragment
 
-1. Crée `patterns/<ton-pseudo>.js` (copie `patterns/hello_world.js` comme base).
-2. Recharge la page : ton fichier apparaît dans le menu déroulant.
-3. Tu peux livecoder directement dans l'éditeur du navigateur, puis recopier le
-   résultat dans ton fichier pour le commiter.
-4. Un fichier par artiste, pour éviter les conflits.
+1. Sélectionne `patterns/<ton-pseudo>.js` dans le menu déroulant (ou crée le
+   fichier au préalable, copie `patterns/hello_world.js` comme base).
+2. Livecode directement dans l'éditeur du navigateur — c'est le flow prévu :
+   retour audio immédiat, coloration syntaxique, sliders, flash à l'évaluation.
+3. Clique sur **💾 Sync** quand tu veux écrire le code affiché dans le vrai
+   fichier `patterns/<ton-pseudo>.js` sur disque (pas d'auto-save en continu,
+   pour éviter une boucle sauvegarde/rechargement pendant que tu tapes). Une
+   fois content, commit/push depuis le terminal ou le panneau Source Control
+   de VS Code comme d'habitude.
+4. Tu peux aussi éditer le fichier depuis VS Code : le navigateur recharge le
+   code à chaud et le rejoue (tant que c'est son pattern qui est affiché).
+   Il faut avoir cliqué play (Ctrl+Enter) une première fois dans la page pour
+   démarrer l'audio — contrainte des navigateurs, pas de notre appli.
+5. Un fichier par artiste, pour éviter les conflits.
 
 Le contenu d'un fichier de `patterns/` est du **code Strudel brut** (le même que
 dans le REPL de strudel.cc), pas un module JS : pas d'`import`, pas d'`export`.
+
+La sauvegarde automatique passe par un petit point d'API (`/api/save-pattern`)
+actif uniquement en mode `npm run dev` — il n'existe pas dans le build de
+production (`npm run build` / `npm run preview`).
 
 ## Commandes
 

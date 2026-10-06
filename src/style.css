@@ -26,13 +26,23 @@ h1 {
   margin-right: auto;
 }
 
-select {
+select,
+button {
   background: #1e222a;
   color: inherit;
   border: 1px solid #2a2e36;
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
   font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 main {

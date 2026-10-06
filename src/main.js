@@ -13,6 +13,12 @@ const container = document.getElementById('strudel');
 
 const label = (path) => path.replace('../patterns/', '').replace(/\.js$/, '');
 
+// Defensive: if this module ever gets re-executed (e.g. a stray HMR reload
+// of main.js itself) instead of a full page reload, don't pile up a second
+// <select>/<strudel-editor>.
+select.innerHTML = '';
+container.innerHTML = '';
+
 for (const path of names) {
   const option = document.createElement('option');
   option.value = path;
@@ -33,3 +39,49 @@ select.addEventListener('change', () => {
   url.searchParams.set('pattern', label(select.value));
   location.href = url.toString();
 });
+
+// Livecoding happens in the browser editor; "Sync" explicitly writes the
+// current code back to the real patterns/<name>.js file on disk, so it shows
+// up as a normal, committable/pushable change in git. Explicit (not on every
+// keystroke) to avoid a save <-> hot-reload feedback loop while typing.
+const syncButton = document.getElementById('sync-pattern');
+syncButton.addEventListener('click', async () => {
+  const code = editor.editor?.code;
+  if (typeof code !== 'string') return;
+  syncButton.disabled = true;
+  syncButton.textContent = '…';
+  try {
+    const res = await fetch('/api/save-pattern', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: label(current), code }),
+    });
+    patterns[current] = code;
+    syncButton.textContent = res.ok ? '✓ Sync' : '✗ Erreur';
+  } catch (err) {
+    console.error('[pattern-saver] save failed', err);
+    syncButton.textContent = '✗ Erreur';
+  } finally {
+    setTimeout(() => {
+      syncButton.textContent = '💾 Sync';
+      syncButton.disabled = false;
+    }, 1200);
+  }
+});
+
+// Live reload: when the pattern file currently shown changes on disk (edited
+// from VS Code, or written by our own Sync button above), sync the editor.
+// Skip it when the content already matches what's in the editor, otherwise
+// it would reset the cursor mid-typing for no reason.
+if (import.meta.hot) {
+  for (const path of names) {
+    import.meta.hot.accept(path, (mod) => {
+      if (!mod) return;
+      patterns[path] = mod.default;
+      if (path === current && editor.editor && editor.editor.code !== mod.default) {
+        editor.setAttribute('code', mod.default);
+        editor.editor.evaluate();
+      }
+    });
+  }
+}
