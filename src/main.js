@@ -162,7 +162,7 @@ select.addEventListener('change', () => {
 // up as a normal, committable/pushable change in git. Explicit (not on every
 // keystroke) to avoid a save <-> hot-reload feedback loop while typing.
 const syncButton = document.getElementById('sync-pattern');
-syncButton.addEventListener('click', async () => {
+const syncPattern = async () => {
   const code = editor.editor?.code;
   if (typeof code !== 'string') return;
   syncButton.disabled = true;
@@ -196,6 +196,15 @@ syncButton.addEventListener('click', async () => {
       syncButton.textContent = '💾 Sync';
       syncButton.disabled = false;
     }, 1200);
+  }
+};
+
+syncButton.addEventListener('click', syncPattern);
+document.addEventListener('keydown', (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's' && target?.closest('.cm-editor')) {
+    event.preventDefault();
+    syncPattern();
   }
 });
 
