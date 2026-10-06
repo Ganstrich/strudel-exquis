@@ -1,5 +1,13 @@
 // "acidic tooth" @by eddyflux
 // @version 1.0
+
+await initHydra();
+osc(30, 0.05, 1.5)
+  .color(0.7, 4, 5.2)
+  .rotate(0.2, H(sine.range(-.1,.1).slow(16)))
+  .modulate(noise(3), H(perlin.range(.15,1.5)))
+  .out(o0);
+
   setcps(1)
   stack(
     note("[<g1 f1>/8](<3 5>,8)")
