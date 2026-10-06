@@ -20,6 +20,17 @@ header {
   border-bottom: 1px solid #2a2e36;
 }
 
+.header-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: #7ed6a5;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 header button {
   white-space: nowrap;
 }
@@ -27,7 +38,7 @@ header button {
 h1 {
   font-size: 1rem;
   margin: 0;
-  margin-right: auto;
+  flex: 0 0 auto;
 }
 
 select,
@@ -99,6 +110,56 @@ main {
   opacity: 0.6;
 }
 
+/* Hydra dessine en plein écran par défaut ; on le confine dans une boîte
+   déplaçable/redimensionnable (voir src/main.js) pour ne pas masquer le code. */
+.hydra-box {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: min(32vw, 320px);
+  height: min(24vw, 240px);
+  min-width: 160px;
+  min-height: 120px;
+  max-width: 90%;
+  max-height: 90%;
+  z-index: 2;
+  background: #000;
+  border: 1px solid #2a2e36;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  resize: both;
+}
+
+.hydra-box-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 0.4rem;
+  color: #8f97a5;
+  background: rgba(20, 22, 26, 0.75);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+.hydra-box canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
 .addon-host {
   flex: 0 0 auto;
 }
@@ -163,12 +224,6 @@ main {
   margin: 0 0 0.8rem;
   color: #f1f3f5;
   font-size: 1rem;
-}
-
-.status {
-  margin: 0 0 1.25rem;
-  color: #7ed6a5;
-  font-size: 0.8rem;
 }
 
 .quick-group {

@@ -45,8 +45,62 @@ container.append(editor);
 // Strudel ajoute ses canvas de dessin (.scope(), .pianoroll(), initHydra(), …)
 // en plein écran sur <body> : on les replace au-dessus du seul éditeur, sinon
 // ils recouvrent le header, la quick sheet et les addons.
+const HYDRA_RECT_KEY = 'strudel-exquis:hydra-rect';
+let hydraBox = null;
+
+// Boîte déplaçable/redimensionnable qui accueille le canvas Hydra ; sa
+// position/taille est mémorisée dans localStorage (persiste entre rechargements).
+const getHydraBox = () => {
+  if (hydraBox) return hydraBox;
+  hydraBox = document.createElement('div');
+  hydraBox.className = 'hydra-box';
+  const handle = document.createElement('div');
+  handle.className = 'hydra-box-handle';
+  handle.textContent = 'hydra ⠿';
+  hydraBox.append(handle);
+  container.append(hydraBox);
+
+  const persistRect = () => {
+    const { left, top, width, height } = hydraBox.style;
+    localStorage.setItem(HYDRA_RECT_KEY, JSON.stringify({ left, top, width, height }));
+  };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(HYDRA_RECT_KEY) ?? 'null');
+    if (saved) Object.assign(hydraBox.style, saved);
+  } catch {
+    // ignore corrupted storage
+  }
+
+  let drag = null;
+  handle.addEventListener('pointerdown', (e) => {
+    drag = { startX: e.clientX, startY: e.clientY, left: hydraBox.offsetLeft, top: hydraBox.offsetTop };
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const bounds = container.getBoundingClientRect();
+    const maxLeft = Math.max(bounds.width - hydraBox.offsetWidth, 0);
+    const maxTop = Math.max(bounds.height - hydraBox.offsetHeight, 0);
+    const left = Math.min(Math.max(drag.left + (e.clientX - drag.startX), 0), maxLeft);
+    const top = Math.min(Math.max(drag.top + (e.clientY - drag.startY), 0), maxTop);
+    hydraBox.style.left = `${left}px`;
+    hydraBox.style.top = `${top}px`;
+    hydraBox.style.right = 'auto';
+  });
+  const stopDrag = () => drag && ((drag = null), persistRect());
+  handle.addEventListener('pointerup', stopDrag);
+  handle.addEventListener('pointercancel', stopDrag);
+
+  new ResizeObserver(persistRect).observe(hydraBox);
+
+  return hydraBox;
+};
+
 const adoptCanvas = (node) => {
-  if (node instanceof HTMLCanvasElement) container.append(node);
+  if (!(node instanceof HTMLCanvasElement)) return;
+  if (node.id === 'hydra-canvas') getHydraBox().append(node);
+  else container.append(node);
 };
 document.body.childNodes.forEach(adoptCanvas);
 new MutationObserver((records) => {
