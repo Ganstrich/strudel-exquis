@@ -6,6 +6,11 @@ Chaque artiste écrit son fragment dans `patterns/`, on les joue dans le navigat
 via un REPL Strudel servi localement. Tout l'environnement vit dans un dev container :
 la seule chose installée sur ta machine est Docker + VS Code.
 
+L'intégration suit le guide officiel [Using Strudel in your Project](https://strudel.cc/technical-manual/project-start/),
+dans sa variante `@strudel/repl` avec une interface utilisateur propre au projet.
+La version du REPL est épinglée pour éviter qu'une mise à jour amont ne change le
+comportement des patterns sans modification explicite du projet.
+
 ## Get started
 
 ### 1. Prérequis (une seule fois, sur ta machine)
