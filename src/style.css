@@ -160,6 +160,17 @@ main {
   pointer-events: none;
 }
 
+/* Repliée (double-clic sur la poignée) : ne garde que la barre de titre. */
+.hydra-box.collapsed {
+  height: 18px !important;
+  min-height: 0;
+  resize: none;
+}
+
+.hydra-box.collapsed canvas {
+  display: none;
+}
+
 .addon-host {
   flex: 0 0 auto;
 }

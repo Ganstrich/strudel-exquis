@@ -62,15 +62,34 @@ const getHydraBox = () => {
 
   const persistRect = () => {
     const { left, top, width, height } = hydraBox.style;
-    localStorage.setItem(HYDRA_RECT_KEY, JSON.stringify({ left, top, width, height }));
+    const collapsed = hydraBox.classList.contains('collapsed');
+    const expandedHeight = hydraBox.dataset.expandedHeight ?? '';
+    localStorage.setItem(HYDRA_RECT_KEY, JSON.stringify({ left, top, width, height, collapsed, expandedHeight }));
   };
 
   try {
     const saved = JSON.parse(localStorage.getItem(HYDRA_RECT_KEY) ?? 'null');
-    if (saved) Object.assign(hydraBox.style, saved);
+    if (saved) {
+      const { collapsed, expandedHeight, ...rect } = saved;
+      Object.assign(hydraBox.style, rect);
+      if (expandedHeight) hydraBox.dataset.expandedHeight = expandedHeight;
+      if (collapsed) hydraBox.classList.add('collapsed');
+    }
   } catch {
     // ignore corrupted storage
   }
+
+  // Double-clic sur la barre : replie la boîte pour ne garder que la poignée.
+  handle.addEventListener('dblclick', () => {
+    if (hydraBox.classList.contains('collapsed')) {
+      hydraBox.style.height = hydraBox.dataset.expandedHeight || '';
+      hydraBox.classList.remove('collapsed');
+    } else {
+      hydraBox.dataset.expandedHeight = hydraBox.style.height || `${hydraBox.offsetHeight}px`;
+      hydraBox.classList.add('collapsed');
+    }
+    persistRect();
+  });
 
   let drag = null;
   handle.addEventListener('pointerdown', (e) => {
