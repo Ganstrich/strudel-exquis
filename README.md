@@ -100,6 +100,105 @@ La sauvegarde automatique passe par un petit point d'API (`/api/save-pattern`)
 actif uniquement en mode `npm run dev` — il n'existe pas dans le build de
 production (`npm run build` / `npm run preview`).
 
+## Visuels live
+
+Strudel sait dessiner tout seul : ces fonctions s'accrochent à un pattern et
+affichent un canvas au-dessus de l'éditeur. Exemple complet :
+`patterns/examples/visuals.js`.
+
+| Fonction | Effet |
+| --- | --- |
+| `.scope()` | oscilloscope / forme d'onde |
+| `.spectrum()` | analyseur de spectre |
+| `.pianoroll()` | rouleau de notes qui défile |
+| `.punchcard()` | grille des événements du cycle |
+| `.spiral()` | spirale temporelle |
+| `.pitchwheel()` | hauteurs réparties sur l'octave |
+
+```js
+$: s("bd sd hh*4").scope();
+$: n("c3 e3 g3 b3").pianoroll();
+```
+
+### Hydra
+
+Pour des visuels génératifs plein écran, Strudel embarque
+[Hydra](https://hydra.ojack.xyz/). Dans le code du pattern :
+
+```js
+await initHydra();
+
+osc(10, 0.1, 0.8).rotate(0.1, 0.1).modulate(noise(3)).out(o0);
+
+$: s("bd sd hh*2").bank("RolandTR909");
+```
+
+`initHydra()` télécharge `hydra-synth` depuis unpkg au premier appel : il faut
+une connexion internet. `initHydra({ detectAudio: true })` réagit au micro, et
+`H(pattern)` permet de piloter un paramètre Hydra avec un pattern Strudel.
+`clearHydra()` enlève le canvas.
+
+Strudel ajoute ces canvas en plein écran sur le `<body>` ; le player les
+déplace au-dessus de l'éditeur seul, pour qu'ils ne masquent ni le header, ni la
+quick sheet, ni les addons (voir [src/main.js](src/main.js)).
+
+## Addons
+
+Un **addon** est un module qui ajoute quelque chose à l'interface live sans
+toucher au cœur du player : visualisation, contrôleur MIDI, metronome, panneau
+de notes… Ils vivent dans `src/addons/` et sont listés dans
+[src/addons/index.js](src/addons/index.js).
+
+Addon fourni : **Visualizer** — forme d'onde + spectre du son qui sort de
+Strudel, affichés sous l'éditeur (bouton *masquer* / *afficher*). Contrairement
+à `.scope()`, il écoute le **mix complet** et tourne en permanence, sans avoir à
+l'ajouter au pattern.
+
+### Ajouter un addon
+
+1. Crée `src/addons/<mon-addon>.js` et exporte un objet avec `id`, `name` et
+   `setup(context)` :
+
+   ```js
+   export default {
+     id: 'metronome',
+     name: 'Metronome',
+     setup({ host, editor, patternName }) {
+       const panel = document.createElement('section');
+       panel.className = 'addon';
+       panel.textContent = `bientôt un metronome pour ${patternName}`;
+       host.append(panel);
+
+       // optionnel : fonction de nettoyage
+       return () => panel.remove();
+     },
+   };
+   ```
+
+2. Enregistre-le dans [src/addons/index.js](src/addons/index.js) :
+
+   ```js
+   import metronome from './metronome.js';
+
+   export const addons = [visualizer, metronome];
+   ```
+
+3. Recharge la page : l'addon est monté au démarrage.
+
+Le `context` passé à `setup()` contient :
+
+| Clé | Contenu |
+| --- | --- |
+| `host` | le `<div id="addons">` sous l'éditeur, où ajouter ton UI |
+| `editor` | l'élément `<strudel-editor>` (`editor.editor` = l'instance StrudelMirror : `.code`, `.evaluate()`, `.stop()`) |
+| `patternName` | le nom du pattern affiché, ex. `valentin` |
+
+Pour analyser l'audio, importe `getAnalyser()` depuis
+[src/addons/audio-tap.js](src/addons/audio-tap.js) : il renvoie un `AnalyserNode`
+branché sur la sortie de Strudel (ou `null` tant que l'audio n'a pas démarré).
+Les styles communs (`.addon`, `.addon-bar`, `.addon-canvas`) sont dans
+[src/style.css](src/style.css).
+
 ## Commandes
 
 | Commande | Effet |
@@ -114,6 +213,7 @@ production (`npm run build` / `npm run preview`).
 .devcontainer/devcontainer.json  environnement (Node 22, extensions, port 5173)
 patterns/                        un fichier de code Strudel par artiste
 src/main.js                      charge les patterns et monte le REPL
+src/addons/                      addons de l'interface live (visualizer, …)
 index.html                       page du player
 ```
 

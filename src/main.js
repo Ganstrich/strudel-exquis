@@ -1,4 +1,9 @@
 import '@strudel/repl';
+import { installAudioTap } from './addons/audio-tap.js';
+import { setupAddons } from './addons/index.js';
+
+// Doit être installé avant que Strudel ne crée son AudioContext (au premier clic).
+installAudioTap();
 
 // Every file in patterns/ is loaded as raw text and handed to the Strudel editor.
 const patterns = import.meta.glob('../patterns/**/*.js', {
@@ -36,6 +41,21 @@ patternPath.textContent = `patterns/${relativePath(current)}`;
 const editor = document.createElement('strudel-editor');
 editor.setAttribute('code', patterns[current] ?? '// add a file in patterns/ to get started');
 container.append(editor);
+
+// Strudel ajoute ses canvas de dessin (.scope(), .pianoroll(), initHydra(), …)
+// en plein écran sur <body> : on les replace au-dessus du seul éditeur, sinon
+// ils recouvrent le header, la quick sheet et les addons.
+const adoptCanvas = (node) => {
+  if (node instanceof HTMLCanvasElement) container.append(node);
+};
+document.body.childNodes.forEach(adoptCanvas);
+new MutationObserver((records) => {
+  for (const record of records) record.addedNodes.forEach(adoptCanvas);
+}).observe(document.body, { childList: true });
+
+const addonHost = document.getElementById('addons');
+addonHost.innerHTML = '';
+setupAddons({ editor, host: addonHost, patternName: label(current) });
 
 const startButton = document.getElementById('start-pattern');
 const stopButton = document.getElementById('stop-pattern');
